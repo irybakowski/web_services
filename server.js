@@ -1,6 +1,11 @@
 const express = require('express');
-const helmet = require("helmet");
+const helmet = require('helmet');
 const bodyParser = require('body-parser');
+const formidable = require('formidable');
+const fs = require('fs');
+
+let yup = require('yup');
+
 const app = express();
 const port = 3000;
 
@@ -12,7 +17,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.get('/', (req, res) => {
-  res.send('Hello World app.js!')
+  res.send('Hello World!')
 })
 
 app.get('/info', (req, res) => {
@@ -21,6 +26,33 @@ app.get('/info', (req, res) => {
     'author' : 23103
   });
 })
+
+let schema = yup.object().shape({
+  name: yup.string().trim().max(10).matches(/^[a-zA-Z]+$/).required()
+})
+
+app.get('/hello/:name', (req, res) => {
+  schema.isValid(req.params).then(function (valid) {
+    if (valid) {
+      res.status(200);
+      res.send('Hello ' + req.params.name);
+    } else {
+      res.status(400);
+      res.send("Error 400 Name is not valid");
+    }
+  })
+})
+
+let tab = [];
+
+app.post('/store', function (req, res) {
+  tab.push(req.body.input)
+  res.status(201)
+  res.json({
+    stored_data: tab
+  })
+})
+
 
 const runServer = (port) => {
   app.listen(port, () => {
