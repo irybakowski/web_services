@@ -3,11 +3,18 @@ const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const formidable = require('formidable');
 const fs = require('fs');
+var jwt = require('jsonwebtoken');
 
 let yup = require('yup');
 
 const app = express();
 const port = 3000;
+
+
+const LOGIN = "test";
+const PASSWORD = "12341234";
+const PRIVATE_KEY = "someSecretKey";
+
 
 app.use(express.json());
 app.use(helmet());
@@ -52,6 +59,18 @@ app.post('/store', function (req, res) {
     stored_data: tab
   })
 })
+
+app.post('/login', function (req, res) {
+  console.log(req.body.login);
+  console.log(req.body.password);
+  if (req.body.login != LOGIN | req.body.password != PASSWORD) {
+    res.status(401);
+    res.send("Invalid login data");
+  } else {
+    var token = jwt.sign(LOGIN, PRIVATE_KEY);
+    res.send(token)
+  }
+});
 
 
 const runServer = (port) => {

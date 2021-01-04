@@ -25,6 +25,7 @@
     "express": "^4.17.1",
     "formidable": "^1.2.2",
     "helmet": "^4.2.0",
+    "jsonwebtoken": "^8.5.1",
     "yup": "^0.32.8"
   }
 }
