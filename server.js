@@ -3,7 +3,7 @@ const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const formidable = require('formidable');
 const fs = require('fs');
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 let yup = require('yup');
 
@@ -15,6 +15,7 @@ const LOGIN = "test";
 const PASSWORD = "12341234";
 const PRIVATE_KEY = "someSecretKey";
 
+var TOKEN = null;
 
 app.use(express.json());
 app.use(helmet());
@@ -61,17 +62,42 @@ app.post('/store', function (req, res) {
 })
 
 app.post('/login', function (req, res) {
-  console.log(req.body.login);
-  console.log(req.body.password);
   if (req.body.login != LOGIN | req.body.password != PASSWORD) {
     res.status(401);
     res.send("Invalid login data");
   } else {
-    var token = jwt.sign(LOGIN, PRIVATE_KEY);
-    res.send(token)
+    TOKEN = jwt.sign(LOGIN, PRIVATE_KEY);
+    res.send(TOKEN)
   }
 });
 
+app.get('/profile',verifyToken,(req,res)=>{
+  jwt.verify(req.token,PRIVATE_KEY,(err,authLogin)=>{
+      if(err) {
+        res.status(401);
+        res.send("Invalid Token");
+      }   
+      else{
+          res.json({
+              login:authLogin
+          })     
+      }
+  })
+});
+
+
+function verifyToken(req,res,next){
+  const bearerHeader = req.headers['authorization'];
+  if(typeof bearerHeader !== 'undefined'){
+      const bearer = bearerHeader.split(' ');
+      const bearerToken = bearer[1];
+      req.token = bearerToken;
+      next();
+  }else{
+    res.status(401);
+    res.send("Invalid Token");
+  }
+}
 
 const runServer = (port) => {
   app.listen(port, () => {
