@@ -2,6 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const formidable = require('formidable');
+const cors = require('cors');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 
@@ -83,6 +84,37 @@ app.get('/profile',verifyToken,(req,res)=>{
           })     
       }
   })
+});
+
+
+app.post("/parse", function (req, res) {
+  const form = formidable({ multiples: true });
+  form.parse(req, (err, fields, files) => {
+    let path = files.toParse.path;
+    fs.readFile(path, "utf8", (err, data) => {
+      const values = data.toString().trim().split(";");
+      const result = {};
+      values.forEach((item) => {
+        const parsedItem = item.replace(":", ";");
+        const [key, value] = parsedItem.split(";");
+        const parsedValue = Number(value);
+        if (!Number.isNaN(parsedValue)) {
+            result[key] = parsedValue;
+        } else {
+            const subValues = value.split(",");
+            result[key] = {};
+            subValues.forEach((subItem) => {
+                const [subKey, subValue] = subItem.split(":");
+                result[key][subKey] = Number(subValue);
+            });
+          }
+      });
+      return res.status(200)
+      .json({
+        result
+      });
+    });
+  });
 });
 
 
