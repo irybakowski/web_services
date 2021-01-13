@@ -44,10 +44,10 @@ app.get('/hello/:name', (req, res) => {
   schema.isValid(req.params).then(function (valid) {
     if (valid) {
       res.status(200);
-      res.send('Hello ' + req.params.name);
+      res.send('Hello ' + req.params.name + "!");
     } else {
       res.status(400);
-      res.send("Error 400 Name is not valid");
+      res.send("Name is not valid");
     }
   })
 })
