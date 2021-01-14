@@ -1,5 +1,8 @@
-const axios = require("axios");
-const qs = require("qs");
+const axios = require('axios');
+const qs = require('querystring');
+const parsers = require('./parsers');
+const { LOGIN, PASSWORD, PRIVATE_KEY } = require('./consts');
+const jwt = require('jsonwebtoken');
 
 
 axios.defaults.baseURL = "http://localhost:3000";
