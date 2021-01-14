@@ -5,16 +5,14 @@ const formidable = require('formidable');
 const cors = require('cors');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const user_data = require('./consts');
+const parsers = require('./parsers');
 
 let yup = require('yup');
 
 const app = express();
 const port = 3000;
 
-
-const LOGIN = "test";
-const PASSWORD = "12341234";
-const PRIVATE_KEY = "someSecretKey";
 
 var TOKEN = null;
 
@@ -63,17 +61,17 @@ app.post('/store', function (req, res) {
 })
 
 app.post('/login', function (req, res) {
-  if (req.body.login != LOGIN | req.body.password != PASSWORD) {
+  if (req.body.login != user_data.LOGIN | req.body.password != user_data.PASSWORD) {
     res.status(401);
     res.send("Invalid login data");
   } else {
-    TOKEN = jwt.sign(LOGIN, PRIVATE_KEY);
+    TOKEN = jwt.sign(user_data.LOGIN, user_data.PRIVATE_KEY);
     res.send(TOKEN)
   }
 });
 
 app.get('/profile',verifyToken,(req,res)=>{
-  jwt.verify(req.token,PRIVATE_KEY,(err,authLogin)=>{
+  jwt.verify(req.token,user_data.PRIVATE_KEY,(err,authLogin)=>{
       if(err) {
         res.status(401);
         res.send("Invalid Token");
